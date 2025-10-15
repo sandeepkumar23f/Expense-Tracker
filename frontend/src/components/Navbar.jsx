@@ -16,7 +16,7 @@ export default function Navbar({ login, setLogin }) {
         {login && (
           <>
             <li><Link to="/">Expense</Link></li>
-            <li><Link to="/add">Add Expense</Link></li>
+            <li><Link to="/add-expense">Add Expense</Link></li>
             <li><button onClick={logout} className="logout-btn">Logout</button></li>
           </>
         )}

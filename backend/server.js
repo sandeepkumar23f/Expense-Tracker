@@ -140,6 +140,25 @@ app.get("/expenses", async (req, res) => {
   }
 });
 
+app.delete("/delete/:id", async (req, res) => {
+  try {
+    const db = await connection();
+    const collection = db.collection(collectionName);
+    const { id } = req.params;
+
+    const result = await collection.deleteOne({ _id: new ObjectId(id) });
+
+    if (result.deletedCount > 0) {
+      res.status(200).json({ success: true, message: "Expense deleted successfully" });
+    } else {
+      res.status(404).json({ success: false, message: "Expense not found" });
+    }
+  } catch (err) {
+    console.error("Error deleting expense", err.message);
+    res.status(500).json({ success: false, message: "Error deleting expense" });
+  }
+});
+
 // function verifyToken(req, res, next) {
 //   const token = req.cookies.token;
 //   if (!token)
