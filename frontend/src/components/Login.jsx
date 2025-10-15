@@ -5,10 +5,10 @@ export default function Login() {
   const [userData,setUserData]=useState({email: "", password: ""})
   const navigate = useNavigate();
 
-  useEffect(()=>{
-    localStorage.getItem("login")
-    navigate("/")
-  },[navigate])
+  // useEffect(()=>{
+  //   localStorage.getItem("login")
+  //   navigate("/")
+  // },[navigate])
 
   const handleLogin = async ()=>{
     if(!userData.email || !userData.password){

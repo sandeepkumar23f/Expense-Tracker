@@ -39,7 +39,7 @@ app.post("/signup", async (req, res) => {
         res.send({ success: true, message: "Signup Successful" });
       });
     } else {
-      res.send({ success: false, message: "Signup Failed" });
+      return res.send({ success: false, message: "Signup Failed" });
     }
   }
 });
@@ -78,10 +78,11 @@ app.post("/login", async (req, res) => {
   });
 });
 
-app.post("/add-expense", async (req, res) => {
+app.post("/add-expense", verifyJWTToken, async (req, res) => {
   try {
     const expense = {
       ...req.body,
+      userId: new ObjectId(req.user._id),
       createdAt: new Date(),
     };
     if(!expense.title || !expense.amount){
@@ -116,16 +117,16 @@ app.post("/add-expense", async (req, res) => {
     })
   }
 });
-app.get("/expenses", async (req, res) => {
+app.get("/expenses", verifyJWTToken, async (req, res) => {
   try {
     const db = await connection();
     const collection = await db.collection(collectionName);
 
-    // const expenses = await collection
-    //   .find({ userId: new ObjectId(req.user._id) })
-    //   .toArray();
+    const expenses = await collection
+      .find({ userId: new ObjectId(req.user._id) })
+      .toArray();
 
-    const expenses = await collection.find({}).toArray();
+    // const expenses = await collection.find({}).toArray();
 
     res.status(200).json({
       success: true,
@@ -140,18 +141,21 @@ app.get("/expenses", async (req, res) => {
   }
 });
 
-app.delete("/delete/:id", async (req, res) => {
+app.delete("/delete/:id", verifyJWTToken, async (req, res) => {
   try {
     const db = await connection();
     const collection = db.collection(collectionName);
     const { id } = req.params;
 
-    const result = await collection.deleteOne({ _id: new ObjectId(id) });
+    const result = await collection.deleteOne({
+        _id: new ObjectId(id),
+        userId: new ObjectId(req.user._id)
+     });
 
     if (result.deletedCount > 0) {
       res.status(200).json({ success: true, message: "Expense deleted successfully" });
     } else {
-      res.status(404).json({ success: false, message: "Expense not found" });
+      return res.status(404).json({ success: false, message: "Expense not found" });
     }
   } catch (err) {
     console.error("Error deleting expense", err.message);
@@ -159,15 +163,18 @@ app.delete("/delete/:id", async (req, res) => {
   }
 });
 
-app.get("/expense/:id", async(req,res)=>{
+app.get("/expense/:id", verifyJWTToken, async(req,res)=>{
   try{
     const db = await connection();
     const collection = db.collection(collectionName);
     const { id } = req.params;
-    const result = await collection.findOne({ _id: new ObjectId(id)});
+    const result = await collection.findOne({
+      _id: new ObjectId(id),
+      userId: new ObjectId(req.user._id)
+    });
 
     if(!result){
-      res.status(404).json({
+      return res.status(404).json({
         success: false,
         message: "Expense not found",
       })
@@ -175,7 +182,7 @@ app.get("/expense/:id", async(req,res)=>{
     res.status(200).json({
       success: true,
       message: "Expense fetched successfully",
-      result
+      expense: result
     })
   } catch(err){
     console.error("Error fetching task",err);
@@ -187,7 +194,7 @@ app.get("/expense/:id", async(req,res)=>{
   }
 });
 
-app.put("/update-expense/:id", async(req,res)=>{
+app.put("/update-expense/:id", verifyJWTToken, async(req,res)=>{
   try{
     const db = await connection();
     const collection = await db.collection(collectionName);
@@ -195,7 +202,9 @@ app.put("/update-expense/:id", async(req,res)=>{
     const { title , amount } = req.body;
 
     const update = { $set: { title, amount}};
-    const result = await collection.updateOne({ _id: new ObjectId(id)},update);
+    const result = await collection.updateOne({ _id: new ObjectId(id),
+      userId: new ObjectId(req.user._id)
+    },update);
     
     if(result.modifiedCount > 0){
       res.status(200)
@@ -209,18 +218,21 @@ app.put("/update-expense/:id", async(req,res)=>{
     .json({ success: false, message: "Server error", err: err.message})
   }
 })
-// function verifyToken(req, res, next) {
-//   const token = req.cookies.token;
-//   if (!token)
-//     return res.status(401).send({ success: false, message: "Unauthorized" });
+function verifyJWTToken(req,res,next){
+  const token = req.cookies["token"];
+  if(!token){
+    return res.status(401).json({ success: false, message: "No token found"})
+  }
 
-//   jwt.verify(token, "Google", (err, decoded) => {
-//     if (err)
-//       return res.status(401).send({ success: false, message: "Invalid Token" });
-//     req.user = decoded;
-//     next();
-//   });
-// }
+  jwt.verify(token, "Google", (error, decoded)=>{
+    if(error){
+    return res.status(403).json( { message: "Invalid token", success: false})
+    }
+
+    req.user = decoded;
+    next();
+  })
+}
 
 app.listen(port, () => {
   console.log(`App is listening on port ${port}`);

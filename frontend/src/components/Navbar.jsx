@@ -17,7 +17,7 @@ export default function Navbar({ login, setLogin }) {
           <>
             <li><Link to="/">Expense</Link></li>
             <li><Link to="/add-expense">Add Expense</Link></li>
-            <li><button onClick={logout} className="logout-btn">Logout</button></li>
+            <li><button onClick={logout}>Logout</button></li>
           </>
         )}
       </ul>
