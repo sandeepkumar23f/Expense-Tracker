@@ -159,6 +159,56 @@ app.delete("/delete/:id", async (req, res) => {
   }
 });
 
+app.get("/expense/:id", async(req,res)=>{
+  try{
+    const db = await connection();
+    const collection = db.collection(collectionName);
+    const { id } = req.params;
+    const result = await collection.findOne({ _id: new ObjectId(id)});
+
+    if(!result){
+      res.status(404).json({
+        success: false,
+        message: "Expense not found",
+      })
+    }
+    res.status(200).json({
+      success: true,
+      message: "Expense fetched successfully",
+      result
+    })
+  } catch(err){
+    console.error("Error fetching task",err);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      err: err.message
+    })
+  }
+});
+
+app.put("/update-expense/:id", async(req,res)=>{
+  try{
+    const db = await connection();
+    const collection = await db.collection(collectionName);
+    const { id } = req.params;
+    const { title , amount } = req.body;
+
+    const update = { $set: { title, amount}};
+    const result = await collection.updateOne({ _id: new ObjectId(id)},update);
+    
+    if(result.modifiedCount > 0){
+      res.status(200)
+      .json({ success: true, message: "Expense updated successfully"})
+    } else{
+      res.status(404)
+      .json({ success: false, message: "Expense not found or not change made"})
+    }
+  } catch(err){
+    res.status(500)
+    .json({ success: false, message: "Server error", err: err.message})
+  }
+})
 // function verifyToken(req, res, next) {
 //   const token = req.cookies.token;
 //   if (!token)

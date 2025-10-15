@@ -79,6 +79,7 @@ export default function Expense(){
               >
                 Delete
               </button>
+              <Link to={`/update/${expense._id}`}>Update</Link>
             </li>
           ))}
         </ul>

@@ -6,6 +6,7 @@ import Expense from "./components/Expense";
 import Login from "./components/Login";
 import AddExpense from "./components/AddExpense";
 import Navbar from "./components/Navbar";
+import UpdateExpense from "./components/UpdateExpense";
 function App() {
   const [login, setLogin]=useState(!!localStorage.getItem("login"))
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/login" element={<Login/>} />
         <Route path="/expenses" element={<Expense/>} />
         <Route path="/add-expense" element={<AddExpense/>} />
+        <Route path="/update/:id" element={<UpdateExpense/>} />
       </Routes>
       </>
   );
