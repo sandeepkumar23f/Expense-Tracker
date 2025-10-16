@@ -10,15 +10,17 @@ export default function Login() {
   //   navigate("/")
   // },[navigate])
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
   const handleLogin = async ()=>{
     if(!userData.email || !userData.password){
       console.log("Enter all details")
       alert("please fill all fields")
       return;
     }
-
+    
     try{
-      let res = await fetch("http://localhost:5000/login",{
+      let res = await fetch(`${API_URL}/login`,{
         method: "POST",
         body: JSON.stringify(userData),
         credentials: "include",

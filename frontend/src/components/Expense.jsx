@@ -9,9 +9,10 @@ export default function Expense() {
     getExpenseData();
   }, []);
 
+  const API_URL = import.meta.env.VITE_API_URL;
   const getExpenseData = async () => {
     try {
-      const res = await fetch("http://localhost:5000/expenses", {
+      const res = await fetch(`${API_URL}/expenses`, {
         credentials: "include",
         cache: "no-store",
       });
@@ -30,7 +31,7 @@ export default function Expense() {
 
   const deleteExpense = async (id) => {
     try {
-      const res = await fetch(`http://localhost:5000/delete/${id}`, {
+      const res = await fetch(`${API_URL}/delete/${id}`, {
         method: "DELETE",
         credentials: "include",
       });

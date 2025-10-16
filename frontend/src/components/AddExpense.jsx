@@ -17,7 +17,7 @@ export default function AddExpense() {
     }
 
     try {
-      const res = await fetch("http://localhost:5000/add-expense", {
+      const res = await fetch("https://expense-tracker-3-tejm.onrender.com/add-expense", {
         method: "POST",
         body: JSON.stringify(expenseData),
         headers: { "Content-Type": "application/json" },

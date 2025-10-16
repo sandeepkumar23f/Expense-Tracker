@@ -4,17 +4,18 @@ import {Link, useNavigate } from "react-router-dom"
 export default function SignUp(){
     const [userData,setUserData]=useState({name: "", email: "", password: ""});
     const navigate = useNavigate();
+    const API_URL = import.meta.env.VITE_API_URL;
     const handleSignUp = async ()=>{
         if(!userData.name || !userData.email || !userData.password){
             alert("please fill all fields");
             return;
         }
         try{
-            let result = await fetch("http://localhost:5000/signup", {
+            let result = await fetch(`${API_URL}/signup`, {
                 method: "POST",
                 credentials: "include",
                 body: JSON.stringify(userData),
-                headers: {"Content-Type":"Application/json"},
+                headers: {"Content-Type":"application/json"},
             })
 
             result = await result.json();

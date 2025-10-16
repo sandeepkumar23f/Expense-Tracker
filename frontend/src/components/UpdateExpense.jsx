@@ -25,10 +25,10 @@ export default function UpdateExpense() {
   useEffect(() => {
     getExpense(id);
   }, [id]);
-
+  const API_URL = import.meta.env.VITE_API_URL;
   const getExpense = async (id) => {
     try {
-      let res = await fetch(`http://localhost:5000/expense/${id}`, {
+      let res = await fetch(`${API_URL}/expense/${id}`, {
         credentials: "include",
       });
       const data = await res.json();
@@ -56,7 +56,7 @@ export default function UpdateExpense() {
     }
 
     try {
-      const res = await fetch(`http://localhost:5000/update-expense/${id}`, {
+      const res = await fetch(`${API_URL}/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(expenseData),
