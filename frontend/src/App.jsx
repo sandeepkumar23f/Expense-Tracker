@@ -8,6 +8,7 @@ import AddExpense from "./components/AddExpense";
 import Navbar from "./components/Navbar";
 import UpdateExpense from "./components/UpdateExpense";
 import Protected from "./components/Protected";
+import ExpenseChart from "./components/ExpenseChart";
 function App() {
   const [login, setLogin]=useState(!!localStorage.getItem("login"))
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route path="/login" element={<Login setLogin={setLogin}/>} />
         <Route path="/add-expense" element={<Protected login={login}><AddExpense/></Protected>} />
         <Route path="/update/:id" element={<Protected login={login}><UpdateExpense/></Protected>} />
+        <Route path="/expense-chart" element={<Protected login={login}><ExpenseChart/></Protected>} />
       </Routes>
       </>
   );

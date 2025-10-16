@@ -84,6 +84,7 @@ app.post("/add-expense", verifyJWTToken, async (req, res) => {
       ...req.body,
       userId: new ObjectId(req.user._id),
       createdAt: new Date(),
+      date: req.body.date || new Date()
     };
     if(!expense.title || !expense.amount){
       return res.status(400).json(
@@ -199,9 +200,9 @@ app.put("/update-expense/:id", verifyJWTToken, async(req,res)=>{
     const db = await connection();
     const collection = await db.collection(collectionName);
     const { id } = req.params;
-    const { title , amount } = req.body;
+    const { title , amount, category, date } = req.body;
 
-    const update = { $set: { title, amount}};
+    const update = { $set: { title, amount, category, date}};
     const result = await collection.updateOne({ _id: new ObjectId(id),
       userId: new ObjectId(req.user._id)
     },update);

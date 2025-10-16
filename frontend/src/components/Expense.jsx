@@ -1,5 +1,6 @@
-import { useState, useEffect, Fragment } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import ExpenseChart from "./ExpenseChart";
 
 export default function Expense() {
   const [expenseData, setExpenseData] = useState([]);
@@ -10,76 +11,109 @@ export default function Expense() {
 
   const getExpenseData = async () => {
     try {
-      let result = await fetch("http://localhost:5000/expenses", {
+      const res = await fetch("http://localhost:5000/expenses", {
         credentials: "include",
         cache: "no-store",
       });
-      let data = await result.json();
+      const data = await res.json();
 
       if (data.success) {
         setExpenseData(data.expenses || []);
       } else {
-        alert(data.message || "Failed to fetch expenses try again ");
+        alert(data.message || "Failed to fetch expenses");
       }
-    } catch (error) {
-      console.error("Error fetching task", error);
-      alert("Server error please try again later");
+    } catch (err) {
+      console.error(err);
+      alert("Server error, try again later");
     }
   };
 
   const deleteExpense = async (id) => {
     try {
-      let item = await fetch(`http://localhost:5000/delete/${id}`, {
+      const res = await fetch(`http://localhost:5000/delete/${id}`, {
         method: "DELETE",
         credentials: "include",
       });
-
-      item = await item.json();
-
-      if (item.success) {
-        getExpenseData(), console.log("Expense delete successfully");
-      } else {
-        alert(item.message || "Failed to delete Expenses try again");
-      }
+      const data = await res.json();
+      if (data.success) getExpenseData();
+      else alert(data.message || "Failed to delete expense");
     } catch (err) {
-      console.error("Error deleting task", err);
-      alert("server error please try again later");
+      console.error(err);
+      alert("Server error, try again later");
     }
   };
+
+  // Prepare chart array
+  const chartArray = Object.entries(
+    expenseData.reduce((acc, exp) => {
+      const cat = exp.category || "Others";
+      acc[cat] = (acc[cat] || 0) + Number(exp.amount || 0);
+      return acc;
+    }, {})
+  ).map(([name, value]) => ({ name, value }));
+
   const totalExpense = expenseData.reduce((sum, exp) => sum + Number(exp.amount || 0), 0);
 
   return (
-    <div className="mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Your Expenses</h1>
+    <div className="max-w-3xl mx-auto p-6 bg-gradient-to-br from-blue-50 to-blue-100 min-h-screen">
+      <h1 className="text-3xl font-bold mb-6 text-center text-blue-700">Your Expenses</h1>
 
       {expenseData.length === 0 ? (
-        <p>
+        <p className="text-center text-gray-600">
           No expenses found.{" "}
-          <Link to="/add-expense" className="text-blue-500 underline">
+          <Link to="/add-expense" className="text-blue-500 underline font-medium">
             Add one
           </Link>
         </p>
       ) : (
-        <ul className="space-y-2">
-          {expenseData.map((expense) => (
-            <li
-              key={expense._id}
-              className="p-2 border rounded shadow-sm flex justify-between items-center"
-            >
-              <span>{expense.title}</span>
-              <span>₹{expense.amount}</span>
-              <button
-                onClick={() => deleteExpense(expense._id)}
-                className="bg-red-500 hover:bg-red-400 text-white px-3 py-1 rounded transition duration-200"
-              >
-                Delete
-              </button>
-              <Link to={`/update/${expense._id}`}>Update</Link>
-            </li>
-          ))}
-        </ul>
+        <>
+          <div className="bg-white rounded-xl shadow-lg p-4 mb-6">
+            <ul className="divide-y divide-gray-200">
+              {expenseData.map((expense) => (
+                <li
+                  key={expense._id}
+                  className="flex flex-wrap justify-between items-center py-3 hover:bg-blue-50 rounded-lg px-2 transition"
+                >
+                  <div className="flex flex-col">
+                    <span className="font-semibold text-gray-800">{expense.title}</span>
+                    <span className="text-sm text-gray-500">
+                      {expense.category || "Others"} •{" "}
+                      {expense.date ? new Date(expense.date).toLocaleDateString() : "-"}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <span className="font-semibold text-green-600">₹{expense.amount}</span>
+                    <button
+                      onClick={() => deleteExpense(expense._id)}
+                      className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md transition"
+                    >
+                      Delete
+                    </button>
+                    <Link
+                      to={`/update/${expense._id}`}
+                      className="text-blue-600 hover:underline font-medium"
+                    >
+                      Update
+                    </Link>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {chartArray.length > 0 && (
+            <div className="bg-white rounded-xl shadow-lg p-4 mb-6">
+              <h2 className="text-xl font-semibold text-gray-700 mb-4 text-center">
+                Expenses by Category
+              </h2>
+              <ExpenseChart expenses={chartArray} />
+            </div>
+          )}
+        </>
       )}
-      <h3 className="mt-4 text-lg font-semibold text-right text-blue-700">
+
+      <h3 className="mt-6 text-xl font-semibold text-right text-blue-700">
         Total Expenses: ₹{totalExpense}
       </h3>
     </div>
