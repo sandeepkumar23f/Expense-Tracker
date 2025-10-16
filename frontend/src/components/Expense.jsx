@@ -48,14 +48,8 @@ export default function Expense(){
     }
   }
   return (
-    <div className="container mx-auto p-4">
+    <div className="mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Your Expenses</h1>
-      <Link
-        to={"/add-expense"}
-        className="mb-4 inline-block text-blue-600 hover:underline"
-      >
-        Add Expense
-      </Link>
 
       {expenseData.length === 0 ? (
         <p>
@@ -72,7 +66,7 @@ export default function Expense(){
               className="p-2 border rounded shadow-sm flex justify-between items-center"
             >
               <span>{expense.title}</span>
-              <span>${expense.amount}</span>
+              <span>₹{expense.amount}</span>
               <button
                 onClick={() => deleteExpense(expense._id)}
                 className="bg-red-500 hover:bg-red-400 text-white px-3 py-1 rounded transition duration-200"

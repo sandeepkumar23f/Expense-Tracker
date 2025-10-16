@@ -36,32 +36,38 @@ export default function Login() {
       alert("Login failed please try again")
     }
   }
-  return(
-    <div className="container">
-      <h1>Login</h1>
-      <label>Email</label>
-      <input
-        type="text"
-        placeholder="Enter user email"
-        value={userData.email}
-        onChange={(e) => setUserData({ ...userData, email: e.target.value })}
-      />
+  return (
+  <div className="flex flex-col justify-center items-center min-h-screen space-y-4">
+    <h1 className="text-2xl font-semibold">Login</h1>
 
-      <label>Password</label>
-      <input
-        type="password"
-        placeholder="Enter user password"
-        value={userData.password}
-        onChange={(e) =>
-          setUserData({ ...userData, password: e.target.value })
-        }
-      />
+    <label className="w-64 text-left">Email</label>
+    <input
+      type="text"
+      placeholder="Enter user email"
+      value={userData.email}
+      onChange={(e) => setUserData({ ...userData, email: e.target.value })}
+      className="w-64 border border-gray-300 rounded px-3 py-2"
+    />
 
-      <button onClick={handleLogin} className="submit">
-        Login
-      </button>
+    <label className="w-64 text-left">Password</label>
+    <input
+      type="password"
+      placeholder="Enter user password"
+      value={userData.password}
+      onChange={(e) => setUserData({ ...userData, password: e.target.value })}
+      className="w-64 border border-gray-300 rounded px-3 py-2"
+    />
 
-      <Link to="/signup">Sign Up</Link>
-    </div>
-  )
+    <button
+      onClick={handleLogin}
+      className="w-64 bg-blue-600 text-white py-2 rounded"
+    >
+      Login
+    </button>
+
+    <Link to="/signup" className="text-blue-600 underline">
+      Sign Up
+    </Link>
+  </div>
+);
 }

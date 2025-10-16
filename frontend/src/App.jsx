@@ -7,18 +7,18 @@ import Login from "./components/Login";
 import AddExpense from "./components/AddExpense";
 import Navbar from "./components/Navbar";
 import UpdateExpense from "./components/UpdateExpense";
+import Protected from "./components/Protected";
 function App() {
   const [login, setLogin]=useState(!!localStorage.getItem("login"))
   return (
       <>
       <Navbar login={login} setLogin={setLogin} />
       <Routes>
-        <Route path="/" element={<Expense/>} />
-        <Route path="/signup" element={<SignUp/>} />
-        <Route path="/login" element={<Login/>} />
-        <Route path="/expenses" element={<Expense/>} />
-        <Route path="/add-expense" element={<AddExpense/>} />
-        <Route path="/update/:id" element={<UpdateExpense/>} />
+        <Route path="/" element={<Protected login={login}><Expense/></Protected>} />
+        <Route path="/signup" element={<SignUp setLogin={setLogin}/>} />
+        <Route path="/login" element={<Login setLogin={setLogin}/>} />
+        <Route path="/add-expense" element={<Protected login={login}><AddExpense/></Protected>} />
+        <Route path="/update/:id" element={<Protected login={login}><UpdateExpense/></Protected>} />
       </Routes>
       </>
   );
