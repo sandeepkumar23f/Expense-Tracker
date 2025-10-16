@@ -8,17 +8,30 @@ import dotenv from "dotenv";
 dotenv.config();
 const SECRET_KEY = process.env.JWT_SECRET;
 
-const port = 5000;
+const port = process.env.PORT || 5000;
+
 const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(
-  cors({
-    origin: "https://track-your-expense-r8m6.onrender.com/",
-    credentials: true,
-  })
-);
+const allowedOrigins = [
+  "http://localhost:5173", // local dev
+  "https://track-your-expense-r8m6.onrender.com" // deployed frontend
+];
+
+app.use(cors({
+  origin: function(origin, callback){
+    // allow requests with no origin (like Postman)
+    if(!origin) return callback(null, true);
+    if(allowedOrigins.indexOf(origin) === -1){
+      const msg = `The CORS policy for this site does not allow access from the specified Origin.`;
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
+  credentials: true
+}));
+
 
 
 app.post("/signup", async (req, res) => {
