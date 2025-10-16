@@ -4,6 +4,9 @@ import cors from "cors";
 import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
 import { ObjectId } from "mongodb";
+import dotenv from "dotenv";
+dotenv.config();
+const SECRET_KEY = process.env.JWT_SECRET;
 
 const port = 5000;
 const app = express();
@@ -27,7 +30,7 @@ app.post("/signup", async (req, res) => {
     const result = await collection.insertOne(userData);
     if (result.acknowledged) {
       const tokenData = { _id: result.insertedId, email: userData.email };
-      jwt.sign(tokenData, "Google", { expiresIn: "5d" }, (error, token) => {
+      jwt.sign(tokenData, SECRET_KEY, { expiresIn: "5d" }, (error, token) => {
         if (error)
           return res.status(500).send({ success: false, message: "JWT Error" });
 
@@ -57,6 +60,9 @@ app.post("/login", async (req, res) => {
   const collection = db.collection("users");
 
   const user = await collection.findOne({ email, password });
+  console.log("Login request body:", req.body);
+console.log("SECRET_KEY:", SECRET_KEY);
+
   if (!user) {
     return res
       .status(401)
@@ -64,7 +70,7 @@ app.post("/login", async (req, res) => {
   }
 
   const tokenData = { _id: user._id, email: user.email };
-  jwt.sign(tokenData, "Google", { expiresIn: "5d" }, (error, token) => {
+  jwt.sign(tokenData, SECRET_KEY, { expiresIn: "5d" }, (error, token) => {
     if (error) {
       return res.status(500).send({ success: false, message: "JWT Error" });
     }
@@ -225,7 +231,7 @@ function verifyJWTToken(req,res,next){
     return res.status(401).json({ success: false, message: "No token found"})
   }
 
-  jwt.verify(token, "Google", (error, decoded)=>{
+  jwt.verify(token, SECRET_KEY, (error, decoded)=>{
     if(error){
     return res.status(403).json( { message: "Invalid token", success: false})
     }

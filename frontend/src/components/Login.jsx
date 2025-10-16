@@ -22,7 +22,7 @@ export default function Login() {
         method: "POST",
         body: JSON.stringify(userData),
         credentials: "include",
-        headers: {"Content-Type": "Application/json"}
+        headers: {"Content-Type": "application/json"}
       })
       let data = await res.json();
       if(data.success){

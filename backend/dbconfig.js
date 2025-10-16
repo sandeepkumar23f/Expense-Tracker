@@ -1,7 +1,8 @@
 import { MongoClient } from "mongodb";
+import dotenv from "dotenv";
+dotenv.config();
 
-const url = "mongodb+srv://expense-user:expense1234@cluster0.f2gjwjm.mongodb.net/expense-tracker?retryWrites=true&w=majority&appName=Cluster0";
-
+const url = process.env.MONGODB_URI;
 const dbName = "expense-tracker";
 export const collectionName = "Expenses";
 
