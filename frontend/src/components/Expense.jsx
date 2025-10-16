@@ -1,52 +1,53 @@
 import { useState, useEffect, Fragment } from "react";
 import { Link } from "react-router-dom";
 
-export default function Expense(){
-  const [expenseData,setExpenseData]=useState([]);
+export default function Expense() {
+  const [expenseData, setExpenseData] = useState([]);
 
-  useEffect(()=>{
+  useEffect(() => {
     getExpenseData();
-  },[])
+  }, []);
 
-  const getExpenseData = async ()=>{
-    try{
-      let result = await fetch("http://localhost:5000/expenses",{
+  const getExpenseData = async () => {
+    try {
+      let result = await fetch("http://localhost:5000/expenses", {
         credentials: "include",
-        cache: "no-store"
+        cache: "no-store",
       });
       let data = await result.json();
 
-      if(data.success){
+      if (data.success) {
         setExpenseData(data.expenses || []);
-      } else{
+      } else {
         alert(data.message || "Failed to fetch expenses try again ");
       }
-    } catch(error){
-      console.error("Error fetching task",error);
-      alert("Server error please try again later")
+    } catch (error) {
+      console.error("Error fetching task", error);
+      alert("Server error please try again later");
     }
-  }
+  };
 
-  const deleteExpense = async (id)=>{
-    try{
-      let item = await fetch(`http://localhost:5000/delete/${id}`,{
+  const deleteExpense = async (id) => {
+    try {
+      let item = await fetch(`http://localhost:5000/delete/${id}`, {
         method: "DELETE",
-        credentials: "include"
-      })
+        credentials: "include",
+      });
 
-      item = await item.json()
-      
-      if(item.success){
-        getExpenseData(),
-        console.log("Expense delete successfully")
-      } else{
-        alert(item.message || "Failed to delete Expenses try again")
+      item = await item.json();
+
+      if (item.success) {
+        getExpenseData(), console.log("Expense delete successfully");
+      } else {
+        alert(item.message || "Failed to delete Expenses try again");
       }
-    } catch(err){
+    } catch (err) {
       console.error("Error deleting task", err);
-      alert("server error please try again later")
+      alert("server error please try again later");
     }
-  }
+  };
+  const totalExpense = expenseData.reduce((sum, exp) => sum + Number(exp.amount || 0), 0);
+
   return (
     <div className="mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Your Expenses</h1>
@@ -78,6 +79,9 @@ export default function Expense(){
           ))}
         </ul>
       )}
+      <h3 className="mt-4 text-lg font-semibold text-right text-blue-700">
+        Total Expenses: ₹{totalExpense}
+      </h3>
     </div>
   );
 }
