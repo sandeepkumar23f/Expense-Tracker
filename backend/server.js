@@ -32,17 +32,6 @@ app.use(
   })
 );
 
-// Handle preflight requests globally
-app.options("*", cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, origin);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true,
-}));
 app.use(express.json());
 app.use(cookieParser());
 
