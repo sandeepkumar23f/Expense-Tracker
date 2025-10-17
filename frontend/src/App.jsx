@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import "./App.css";
+
 import SignUp from "./components/SignUp";
 import Expense from "./components/Expense";
 import Login from "./components/Login";
@@ -9,20 +10,52 @@ import Navbar from "./components/Navbar";
 import UpdateExpense from "./components/UpdateExpense";
 import Protected from "./components/Protected";
 import ExpenseChart from "./components/ExpenseChart";
+
 function App() {
-  const [login, setLogin]=useState(!!localStorage.getItem("login"))
+  const [login, setLogin] = useState(!!localStorage.getItem("login"));
+
   return (
-      <>
+    <div className="min-h-screen bg-gray-50">
       <Navbar login={login} setLogin={setLogin} />
-      <Routes>
-        <Route path="/" element={<Protected login={login}><Expense/></Protected>} />
-        <Route path="/signup" element={<SignUp setLogin={setLogin}/>} />
-        <Route path="/login" element={<Login setLogin={setLogin}/>} />
-        <Route path="/add-expense" element={<Protected login={login}><AddExpense/></Protected>} />
-        <Route path="/update/:id" element={<Protected login={login}><UpdateExpense/></Protected>} />
-        <Route path="/expense-chart" element={<Protected login={login}><ExpenseChart/></Protected>} />
-      </Routes>
-      </>
+      <div className="pt-24 px-2 sm:px-6 lg:px-8">
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <Protected login={login}>
+                <Expense />
+              </Protected>
+            }
+          />
+          <Route path="/signup" element={<SignUp setLogin={setLogin} />} />
+          <Route path="/login" element={<Login setLogin={setLogin} />} />
+          <Route
+            path="/add-expense"
+            element={
+              <Protected login={login}>
+                <AddExpense />
+              </Protected>
+            }
+          />
+          <Route
+            path="/update/:id"
+            element={
+              <Protected login={login}>
+                <UpdateExpense />
+              </Protected>
+            }
+          />
+          <Route
+            path="/expense-chart"
+            element={
+              <Protected login={login}>
+                <ExpenseChart />
+              </Protected>
+            }
+          />
+        </Routes>
+      </div>
+    </div>
   );
 }
 

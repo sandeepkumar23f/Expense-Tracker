@@ -24,10 +24,11 @@ a:hover {
 }
 
 body {
+  @apply bg-white;
   margin: 0;
   display: flex;
   place-items: center;
-  min-width: 320px;
+  min-width: 820px;
   min-height: 100vh;
 }
 
