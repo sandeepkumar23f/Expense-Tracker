@@ -16,23 +16,34 @@ app.use(express.json());
 app.use(cookieParser());
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://track-your-expense-r8m6.onrender.com"
+  "https://track-your-expense-r8m6.onrender.com",
 ];
 
-app.use(cors({
-  origin: allowedOrigins,
-  credentials: true,
-  methods: ["GET","POST","PUT","DELETE","OPTIONS"]
-}));
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, origin);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  })
+);
 
-// Also respond to OPTIONS requests globally
+// Handle preflight requests globally
 app.options("*", cors({
-  origin: allowedOrigins,
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, origin);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true,
-  methods: ["GET","POST","PUT","DELETE","OPTIONS"]
 }));
-
-
 
 
 app.post("/signup", async (req, res) => {
@@ -50,9 +61,11 @@ app.post("/signup", async (req, res) => {
 
         res.cookie("token", token, {
           httpOnly: true,
-          sameSite: "lax",
-          maxAge: 5 * 24 * 60 * 60 * 1000,
+          secure: true, 
+          sameSite: "none", 
+          maxAge: 5 * 24 * 60 * 60 * 1000, // 5 days
         });
+
         res.send({ success: true, message: "Signup Successful" });
       });
     } else {
@@ -75,7 +88,7 @@ app.post("/login", async (req, res) => {
 
   const user = await collection.findOne({ email, password });
   console.log("Login request body:", req.body);
-console.log("SECRET_KEY:", SECRET_KEY);
+  console.log("SECRET_KEY:", SECRET_KEY);
 
   if (!user) {
     return res
@@ -90,10 +103,11 @@ console.log("SECRET_KEY:", SECRET_KEY);
     }
 
     res.cookie("token", token, {
-      httpOnly: true,
-      sameSite: "lax",
-      maxAge: 5 * 24 * 60 * 60 * 1000,
-    });
+          httpOnly: true,
+          secure: true, 
+          sameSite: "none", 
+          maxAge: 5 * 24 * 60 * 60 * 1000, // 5 days
+        });
     res.send({ success: true, message: "Login Successful" });
   });
 });
@@ -104,38 +118,35 @@ app.post("/add-expense", verifyJWTToken, async (req, res) => {
       ...req.body,
       userId: new ObjectId(req.user._id),
       createdAt: new Date(),
-      date: req.body.date || new Date()
+      date: req.body.date || new Date(),
     };
-    if(!expense.title || !expense.amount){
-      return res.status(400).json(
-        {
-          success: false,
-          message: "Title and amount are required"
-        }
-      );
+    if (!expense.title || !expense.amount) {
+      return res.status(400).json({
+        success: false,
+        message: "Title and amount are required",
+      });
     }
     const db = await connection();
     const collection = db.collection(collectionName);
     const result = await collection.insertOne(expense);
-    if(result.acknowledged){
+    if (result.acknowledged) {
       return res.status(200).json({
         success: true,
         message: "New Expense added successfully",
         result,
-      })
-    } 
-    else{
+      });
+    } else {
       return res.status(400).json({
         success: false,
         message: "Error Expense not added",
-      })
+      });
     }
-  } catch(error){
-    console.error("Error adding expense: ",error.message);
+  } catch (error) {
+    console.error("Error adding expense: ", error.message);
     res.status(500).json({
       success: false,
-      message: "Server error"
-    })
+      message: "Server error",
+    });
   }
 });
 app.get("/expenses", verifyJWTToken, async (req, res) => {
@@ -169,14 +180,18 @@ app.delete("/delete/:id", verifyJWTToken, async (req, res) => {
     const { id } = req.params;
 
     const result = await collection.deleteOne({
-        _id: new ObjectId(id),
-        userId: new ObjectId(req.user._id)
-     });
+      _id: new ObjectId(id),
+      userId: new ObjectId(req.user._id),
+    });
 
     if (result.deletedCount > 0) {
-      res.status(200).json({ success: true, message: "Expense deleted successfully" });
+      res
+        .status(200)
+        .json({ success: true, message: "Expense deleted successfully" });
     } else {
-      return res.status(404).json({ success: false, message: "Expense not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Expense not found" });
     }
   } catch (err) {
     console.error("Error deleting expense", err.message);
@@ -184,77 +199,83 @@ app.delete("/delete/:id", verifyJWTToken, async (req, res) => {
   }
 });
 
-app.get("/expense/:id", verifyJWTToken, async(req,res)=>{
-  try{
+app.get("/expense/:id", verifyJWTToken, async (req, res) => {
+  try {
     const db = await connection();
     const collection = db.collection(collectionName);
     const { id } = req.params;
     const result = await collection.findOne({
       _id: new ObjectId(id),
-      userId: new ObjectId(req.user._id)
+      userId: new ObjectId(req.user._id),
     });
 
-    if(!result){
+    if (!result) {
       return res.status(404).json({
         success: false,
         message: "Expense not found",
-      })
+      });
     }
     res.status(200).json({
       success: true,
       message: "Expense fetched successfully",
-      expense: result
-    })
-  } catch(err){
-    console.error("Error fetching task",err);
+      expense: result,
+    });
+  } catch (err) {
+    console.error("Error fetching task", err);
     res.status(500).json({
       success: false,
       message: "Server error",
-      err: err.message
-    })
+      err: err.message,
+    });
   }
 });
 
-app.put("/update-expense/:id", verifyJWTToken, async(req,res)=>{
-  try{
+app.put("/update-expense/:id", verifyJWTToken, async (req, res) => {
+  try {
     const db = await connection();
     const collection = await db.collection(collectionName);
     const { id } = req.params;
-    const { title , amount, category, date } = req.body;
+    const { title, amount, category, date } = req.body;
 
-    const update = { $set: { title, amount, category, date}};
-    const result = await collection.updateOne({ _id: new ObjectId(id),
-      userId: new ObjectId(req.user._id)
-    },update);
-    
-    if(result.modifiedCount > 0){
-      res.status(200)
-      .json({ success: true, message: "Expense updated successfully"})
-    } else{
-      res.status(404)
-      .json({ success: false, message: "Expense not found or not change made"})
+    const update = { $set: { title, amount, category, date } };
+    const result = await collection.updateOne(
+      { _id: new ObjectId(id), userId: new ObjectId(req.user._id) },
+      update
+    );
+
+    if (result.modifiedCount > 0) {
+      res
+        .status(200)
+        .json({ success: true, message: "Expense updated successfully" });
+    } else {
+      res
+        .status(404)
+        .json({
+          success: false,
+          message: "Expense not found or not change made",
+        });
     }
-  } catch(err){
-    res.status(500)
-    .json({ success: false, message: "Server error", err: err.message})
+  } catch (err) {
+    res
+      .status(500)
+      .json({ success: false, message: "Server error", err: err.message });
   }
-})
-function verifyJWTToken(req,res,next){
+});
+function verifyJWTToken(req, res, next) {
   const token = req.cookies["token"];
-  if(!token){
-    return res.status(401).json({ success: false, message: "No token found"})
+  if (!token) {
+    return res.status(401).json({ success: false, message: "No token found" });
   }
 
-  jwt.verify(token, SECRET_KEY, (error, decoded)=>{
-    if(error){
-    return res.status(403).json( { message: "Invalid token", success: false})
+  jwt.verify(token, SECRET_KEY, (error, decoded) => {
+    if (error) {
+      return res.status(403).json({ message: "Invalid token", success: false });
     }
 
     req.user = decoded;
     next();
-  })
+  });
 }
-
 
 app.listen(port, () => {
   console.log(`App is listening on port ${port}`);
