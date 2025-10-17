@@ -10,6 +10,7 @@ export default function AddExpense() {
   });
   const navigate = useNavigate();
 
+  const API_URL = import.meta.env.VITE_API_URL;
   const handleAddExpense = async () => {
     if (!expenseData.title || !expenseData.amount) {
       alert("Title and amount both are required");
@@ -17,7 +18,7 @@ export default function AddExpense() {
     }
 
     try {
-      const res = await fetch("https://expense-tracker-3-tejm.onrender.com/add-expense", {
+      const res = await fetch(`${API_URL}/add-expense`, {
         method: "POST",
         body: JSON.stringify(expenseData),
         headers: { "Content-Type": "application/json" },
