@@ -40,24 +40,24 @@ export default function Login() {
   }
   return (
   <div className="flex flex-col justify-center items-center min-h-screen space-y-4">
-    <h1 className="text-2xl font-semibold">Login</h1>
+    <h1 className="text-2xl font-semibold text-black">Login</h1>
 
-    <label className="w-64 text-left">Email</label>
+    <label className="w-64 text-left text-black">Email</label>
     <input
       type="text"
       placeholder="Enter user email"
       value={userData.email}
       onChange={(e) => setUserData({ ...userData, email: e.target.value })}
-      className="w-64 border border-gray-300 rounded px-3 py-2"
+      className="w-64 border border-black rounded px-3 py-2 text-black"
     />
 
-    <label className="w-64 text-left">Password</label>
+    <label className="w-64 text-left text-black">Password</label>
     <input
       type="password"
       placeholder="Enter user password"
       value={userData.password}
       onChange={(e) => setUserData({ ...userData, password: e.target.value })}
-      className="w-64 border border-gray-300 rounded px-3 py-2"
+      className="w-64 border border-black rounded px-3 py-2 text-black"
     />
 
     <button
