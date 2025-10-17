@@ -44,7 +44,6 @@ export default function Expense() {
     }
   };
 
-  // Prepare chart array
   const chartArray = Object.entries(
     expenseData.reduce((acc, exp) => {
       const cat = exp.category || "Others";
@@ -80,7 +79,6 @@ export default function Expense() {
               key={expense._id}
               className="flex flex-col md:flex-row justify-between items-start md:items-center py-3 hover:bg-blue-50 rounded-lg px-2 sm:px-4 transition"
             >
-              {/* Expense Info */}
               <div className="flex flex-col flex-1 min-w-0">
                 <span className="font-semibold text-gray-800 truncate">
                   {expense.title}
@@ -93,7 +91,6 @@ export default function Expense() {
                 </span>
               </div>
 
-              {/* Actions */}
               <div className="flex items-center gap-2 sm:gap-3 mt-2 md:mt-0 flex-wrap">
                 <span className="font-semibold text-green-600">
                   ₹{expense.amount}
@@ -116,7 +113,6 @@ export default function Expense() {
         </ul>
       </div>
 
-      {/* Chart */}
       {chartArray.length > 0 && (
         <div className="bg-white rounded-xl shadow-lg p-2 sm:p-4 mb-6 overflow-x-auto">
           <h2 className="text-lg sm:text-xl font-semibold text-gray-700 mb-4 text-center">
@@ -130,7 +126,6 @@ export default function Expense() {
     </>
   )}
 
-  {/* Total */}
   <h3 className="mt-6 text-lg sm:text-xl font-semibold text-right text-blue-700">
     Total Expenses: ₹{totalExpense}
   </h3>

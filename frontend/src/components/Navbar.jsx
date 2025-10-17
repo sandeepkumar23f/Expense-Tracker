@@ -12,27 +12,25 @@ export default function Navbar({ login, setLogin }) {
   };
 
   return (
+
+    
     <nav className="bg-blue-900 fixed top-0 left-0 w-full shadow-md z-50">
+      
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-20">
-        {/* Logo */}
         <div className="text-white font-bold text-lg sm:text-xl tracking-wide">
           Expense Tracker
         </div>
 
-        {/* Mobile Menu Button */}
         <button
           onClick={() => setMenuOpen(!menuOpen)}
-          className="md:hidden text-white focus:outline-none text-2xl"
+          className="md:hidden text-white hover:text-yellow-300! focus:outline-none text-2xl z-50"
         >
           {menuOpen ? "✖" : "☰"}
         </button>
 
-        {/* Menu Items */}
         <ul
-          className={`flex flex-col md:flex-row md:items-center gap-4 absolute md:static left-0 w-full md:w-auto bg-blue-900 md:bg-transparent transition-all duration-300 ease-in-out ${
-            menuOpen
-              ? "top-20 opacity-100"
-              : "top-[-500px] opacity-0 md:opacity-100"
+          className={`flex flex-col gap-2 absolute top-20 left-0 w-full bg-blue-900 p-4 md:hidden transition-all duration-300 ease-in-out ${
+            menuOpen ? "block" : "hidden"
           }`}
         >
           {login && (
@@ -40,8 +38,8 @@ export default function Navbar({ login, setLogin }) {
               <li>
                 <Link
                   to="/"
-                  className="block px-4 py-3 md:py-2 text-white hover:text-yellow-300 transition text-lg sm:text-xl text-center md:text-left"
                   onClick={() => setMenuOpen(false)}
+                  className="block text-white hover:text-yellow-300 px-4 py-2 rounded text-lg sm:text-xl"
                 >
                   Expense
                 </Link>
@@ -49,19 +47,50 @@ export default function Navbar({ login, setLogin }) {
               <li>
                 <Link
                   to="/add-expense"
-                  className="block px-4 py-3 md:py-2 text-white hover:text-yellow-300 transition text-lg sm:text-xl text-center md:text-left"
                   onClick={() => setMenuOpen(false)}
+                  className="block text-white hover:text-yellow-300 px-4 py-2 rounded text-lg sm:text-xl"
                 >
                   Add Expense
                 </Link>
               </li>
-              <li className="text-center md:text-left">
+              <li>
                 <button
                   onClick={() => {
                     logout();
                     setMenuOpen(false);
                   }}
-                  className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition text-base sm:text-lg mt-2 md:mt-0"
+                  className="w-full bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition text-base sm:text-lg mt-2 z-50"
+                >
+                  Logout
+                </button>
+              </li>
+            </>
+          )}
+        </ul>
+
+        <ul className="hidden md:flex md:items-center gap-4">
+          {login && (
+            <>
+              <li>
+                <Link
+                  to="/"
+                  className="text-white hover:text-yellow-300 text-lg sm:text-xl"
+                >
+                  Expense
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/add-expense"
+                  className="text-white hover:text-yellow-300 text-lg sm:text-xl"
+                >
+                  Add Expense
+                </Link>
+              </li>
+              <li>
+                <button
+                  onClick={logout}
+                  className="bg-red-500! text-white px-4 py-2 rounded-md hover:bg-red-600! transition text-base sm:text-lg"
                 >
                   Logout
                 </button>
