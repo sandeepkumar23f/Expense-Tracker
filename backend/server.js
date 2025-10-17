@@ -12,8 +12,7 @@ const port = process.env.PORT || 5000;
 
 const app = express();
 
-app.use(express.json());
-app.use(cookieParser());
+
 const allowedOrigins = [
   "http://localhost:5173",
   "https://track-your-expense-r8m6.onrender.com",
@@ -44,7 +43,8 @@ app.options("*", cors({
   },
   credentials: true,
 }));
-
+app.use(express.json());
+app.use(cookieParser());
 
 app.post("/signup", async (req, res) => {
   const userData = req.body;
@@ -262,6 +262,7 @@ app.put("/update-expense/:id", verifyJWTToken, async (req, res) => {
   }
 });
 function verifyJWTToken(req, res, next) {
+  console.log("Cookies received:", req.cookies);
   const token = req.cookies["token"];
   if (!token) {
     return res.status(401).json({ success: false, message: "No token found" });
